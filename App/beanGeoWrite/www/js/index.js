@@ -1,17 +1,22 @@
 
 /*
- beanGeoWrite 
+beanGeoWrite 
   
-  This example uses Don Coleman's BLE Central Plugin for Apache Cordova
-  to create a central server that connects and reads data from the Light Blue Bean
-  through ScratchData characteristics. In Conjunction with the Google Maps JS API
-  
-  created 29 Mar 2015
-  by Maria Paula Saba
+This example uses Don Coleman's BLE Central Plugin for Apache Cordova
+to create a central server that connects and reads data from the Light Blue Bean
+through ScratchData characteristics. In Conjunction with the Google Maps JS API
 
-  Modified 19 Apr 2015
-  by Sam Sadtler
-  Used in conjunction with the google maps js API
+created 29 Mar 2015
+by Maria Paula Saba
+
+Modified 19 Apr 2015
+by Sam Sadtler
+Used in conjunction with the google maps js API
+    
+Modified Further 10 Feb 2015
+Switched from BLE Central to BluetoothLE 
+on account of RSSI updating feature
+by Sam Sadtler
 
 */
 
