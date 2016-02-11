@@ -1,4 +1,4 @@
-<h1>Sam Sadtler's 100 Days of Connected Interaction</h1>
+<h1>Sam Sadtler's 100 Days of Connected Interactions</h1>
 
 <h2>His progress can be found @ <a href="http://samsonthebrave.tumblr.com/">On His Tumblr</a></h2>
 
@@ -15,5 +15,11 @@
 	</li>
 	<li>
 		<a href="http://cordova.apache.org/">Cordova</a>
+	</li>
+	<li>
+		<a href="https://www.arduino.cc/">Arduino</a>
+	</li>
+	<li>
+		<a href="http://itp.nyu.edu">Interactive Telecommunications Program at NYU</a>
 	</li>
 </ul>
