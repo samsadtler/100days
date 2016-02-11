@@ -2,6 +2,9 @@
 
 <h2>His progress can be found @ <a href="http://samsonthebrave.tumblr.com/">On His Tumblr</a></h2>
 
+
+<iframe src="http://samsonthebrave.tumblr.com/" width="100%" height="600px"></iframe>
+
 <h3>Key Resources Include:</h3>
 <ul>
 	<li>
