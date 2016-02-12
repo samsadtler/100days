@@ -54,7 +54,7 @@ var DEVICE = 'BeanSadtler';
 // var DEVICE = 'SensorTag';
 var deviceAddress;
 var perviousTemp = 0;
-
+var perviousAccel = 0;
 var scratchServiceUUID = 'a495ff20-c5b1-4b44-b512-1370f02d74de';
 
                             // A495FF10-C5B1-4B44-B512-1370F02D74DE
@@ -179,6 +179,7 @@ var app = {
         bluetoothle.reconnect(app.onConnect, app.bleError, params);
     },
     bleRetrieveConnected: function(){
+        app.bleServices();
         console.log('bleRetrieveConnected')
         var params = {
           "services": [
@@ -190,12 +191,12 @@ var app = {
         }
         bluetoothle.retrieveConnected(app.bleSuccess, app.bleError, params);
     },
-    refreshDeviceList: function() {
-        console.log("refreshDeviceList");
-        deviceList.innerHTML = ''; // empties the list
-        ble.scan([], 5, app.onDiscoverDevice, app.onError); //scans for BLE devices
-        // console.log('devices available', device);
-    },
+    // refreshDeviceList: function() {
+    //     console.log("refreshDeviceList");
+    //     deviceList.innerHTML = ''; // empties the list
+    //     ble.scan([], 5, app.onDiscoverDevice, app.onError); //scans for BLE devices
+    //     // console.log('devices available', device);
+    // },
     rssiProxi: function() {
         console.log('rssiProxi')
         window.setInterval(function(){
@@ -250,17 +251,19 @@ var app = {
         resultDiv.innerHTML = "New Acceleration:" + receivedData[0] + "," + receivedData[1] + "," +
             receivedData[2] + '<br>' + 'Tempature: ' + receivedData[3]+ 
             '<br>' + 'Battery: ' + receivedData[4]+'%'; 
-        if (receivedData[3] > perviousTemp | receivedData[3] < perviousTemp) {
-            app.updateTemp(receivedData[3])
-            perviousTemp = receivedData[3];
+        if (receivedData[1] > perviousAccel | receivedData[1] < perviousAccel) {
+                console.log('update background-color')
+                app.updateAccel(receivedData[0],receivedData[1],receivedData[2])
+                perviousAccel = receivedData[1];
         }
     },
     bleWrite: function(r,g,b){
+        console.log('bleWrite');
         var data = new Uint8Array(3);
 
-        var r = Math.round(Math.random()*255);
-        var g = Math.round(Math.random()*255);
-        var b = Math.round(Math.random()*255);  
+        // var r = Math.round(Math.random()*255);
+        // var g = Math.round(Math.random()*255);
+        // var b = Math.round(Math.random()*255);  
 
         data[0] = r;
         data[1] = g;
@@ -352,6 +355,7 @@ var app = {
             // app.showMapPage();
             app.showConnectPage();
             app.bleRetrieveConnected();
+
     },
 
     // works as a switch to turn on an off the bean
@@ -372,53 +376,53 @@ var app = {
         }
 
     },
-    sendData: function(r,g,b) { 
-        // console.log('data to send:', sweat);
-        // var r = Math.random()*255;
-        // var g = Math.random()*255;
-        // var b = Math.random()*255;  
+    // sendData: function(r,g,b) { 
+    //     // console.log('data to send:', sweat);
+    //     // var r = Math.random()*255;
+    //     // var g = Math.random()*255;
+    //     // var b = Math.random()*255;  
 
-        var data = new Uint8Array(3);
+    //     var data = new Uint8Array(3);
 
-        data[0] = r;
-        data[1] = g;
-        data[2] = b;
+    //     data[0] = r;
+    //     data[1] = g;
+    //     data[2] = b;
 
-        var heading = new Uint8Array(1);
-        heading[0] = Math.round(data);
+    //     var heading = new Uint8Array(1);
+    //     heading[0] = Math.round(data);
     
-        var success = function(){
-            console.log("Data written: ", data);
-        };
+    //     var success = function(){
+    //         console.log("Data written: ", data);
+    //     };
         
-        ble.write(deviceId, scratchServiceUUID, writeCharacteristicUUID, data.buffer, success, app.onError);
-    },
-    getAccel: function(){
-        if (accelVal){
-            accelVal = false; 
-            console.log('getAccel, true');
-            app.stopNotification()
-        }
-        else {
-            accelVal = true; 
-            app.readNotification()
-            console.log('getAccel, true');
-        }
-    },
-    checkAccel: function(){
-        console.log('checkAccel');
-        if (accelVal){
-           app.readNotification()
-        } else {
-            app.stopNotification();
-        }
-     //data received from the bean
-    },
-    readData: function(){
+    //     ble.write(deviceId, scratchServiceUUID, writeCharacteristicUUID, data.buffer, success, app.onError);
+    // },
+    // getAccel: function(){
+    //     if (accelVal){
+    //         accelVal = false; 
+    //         console.log('getAccel, true');
+    //         app.stopNotification()
+    //     }
+    //     else {
+    //         accelVal = true; 
+    //         app.readNotification()
+    //         console.log('getAccel, true');
+    //     }
+    // },
+    // checkAccel: function(){
+    //     console.log('checkAccel');
+    //     if (accelVal){
+    //        app.readNotification()
+    //     } else {
+    //         app.stopNotification();
+    //     }
+    //  //data received from the bean
+    // },
+    // readData: function(){
         
-        ble.read(deviceId, scratchServiceUUID, readCharacteristicUUID, app.readSuccess, app.onError);
+    //     ble.read(deviceId, scratchServiceUUID, readCharacteristicUUID, app.readSuccess, app.onError);
 
-    },
+    // },
     readSuccess: function(data){
             console.log("read data: ", data )
             var receivedData = bluetoothle.encodedStringToBytes(data.value)
@@ -442,6 +446,10 @@ var app = {
                 app.updateTemp(receivedData[3])
                 perviousTemp = receivedData[3];
             }
+            if (receivedData[1] > perviousAccel | receivedData[1] < perviousAccel) {
+                app.updateAccel(receivedData[0],receivedData[1],receivedData[2])
+                perviousAccel = receivedData[1];
+            }
         }
         ble.startNotification(deviceId, scratchServiceUUID, readCharacteristicUUID, success, app.onError);
     },
@@ -452,7 +460,15 @@ var app = {
         ble.startNotification(deviceId, scratchServiceUUID, readCharacteristicUUID, success, app.onError);
     
     },
-
+    updateAccel: function(aX, aY, aZ) {
+        console.log('updateTemp')
+        var green = Math.round(app.map(aX, 0 , 300 , 0 , 255));
+        var red = Math.round(app.map(aY, 0 , 300 , 0 , 255));
+        var blue = Math.round(app.map(aZ, 0 , 300 , 0 , 255));
+        console.log('red: ', red , 'blue:',blue);
+        $("body").css("background-color","rgb("+red+","+green+" ," +blue+")");
+        
+    },
     updateTemp: function(tempature) {
         console.log('updateTemp')
         var red = Math.round(app.map(tempature, 0 , 50 , 0 , 255));
@@ -478,7 +494,7 @@ var app = {
         }
         bluetoothle.unsubscribe(app.bleSuccess, app.bleError, params);
         bluetoothle.disconnect(app.bleSuccess, app.bleError, params);
-        ble.disconnect(deviceId, app.showStartPage, app.onError);
+        // ble.disconnect(deviceId, app.showStartPage, app.onError);
     },
     showStartPage: function() {
         appDiv.hidden = false;
@@ -527,20 +543,51 @@ var app = {
           
     },
     getLocation: function() {
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position){
-                console.log('detected position is --> ' + position);
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-                console.log(lat + ' ' + lon);
-                app.getTheWeatherAPI("Current Location", lat, lon);
-                // geoCodeIt();
-            });
-        } else {
-            return alert("Geolocation is not supported by this browser.");
-        }
-    },
+        console.log('get location')
+        // if ("geolocation" in navigator) {
+        //     navigator.geolocation.getCurrentPosition(function(position) {
+        //         console.log('detected position is --> ' + position);
+        //         var lat = position.coords.latitude;
+        //         var lon = position.coords.longitude;
+        //         console.log(lat + ' ' + lon);
+        //         app.getTheWeatherAPI("Current Location", lat, lon);
+        //     });
+        // } else {
+        //    return alert("Geolocation is not supported by this browser.");
+        // }
 
+        // onError Callback receives a PositionError object
+        //
+        function onError(error) {
+            alert('code: '    + error.code    + '\n' +
+                  'message: ' + error.message + '\n');
+        }
+
+        navigator.geolocation.getCurrentPosition(app.onSuccess, app.onError);
+
+        // if (navigator.geolocation) {
+        //     navigator.geolocation.getCurrentPosition(function(position){
+        //         console.log('detected position is --> ' + position);
+        //         var lat = position.coords.latitude;
+        //         var lon = position.coords.longitude;
+        //         console.log(lat + ' ' + lon);
+        //         app.getTheWeatherAPI("Current Location", lat, lon);
+        //         // geoCodeIt();
+        //     });
+        // } else {
+        //     return alert("Geolocation is not supported by this browser.");
+        // }
+    },
+    onSuccess: function(position) {
+            console.log('Latitude: '          + position.coords.latitude          + '\n' +
+                  'Longitude: '         + position.coords.longitude         + '\n' +
+                  'Altitude: '          + position.coords.altitude          + '\n' +
+                  'Accuracy: '          + position.coords.accuracy          + '\n' +
+                  'Altitude Accuracy: ' + position.coords.altitudeAccuracy  + '\n' +
+                  'Heading: '           + position.coords.heading           + '\n' +
+                  'Speed: '             + position.coords.speed             + '\n' +
+                  'Timestamp: '         + position.timestamp                + '\n');
+    },
     geoCodeIt: function (location){
         console.log("geoCodeIt");
         var apiKey = 'AIzaSyCIxywgknotMlV6Kjqn-HbJgQBkSAMPOlU';
@@ -595,6 +642,7 @@ var app = {
 
     },
     doINeedAnUmbrella: function(location, status, temp, chance){
+        console.log('doINeedAnUmbrella')
         var icon;
         var shortAnswer;
         var longAnswer;
@@ -633,7 +681,7 @@ var app = {
                 // shortAnswer = answerArray[0];
                 // longAnswer = answerArray[getRandomInt(1, answerArray.length)]
                 // console.log("random value = " + getRandomInt(1, answerArray.length) + " and Array length " + answerArray.length + " and answerArray[0] = " + answerArray[0]);
-                return app.sendData(r,g,b);
+                app.bleWrite(r,g,b);
                 }
         }); 
     },
@@ -835,6 +883,9 @@ var app = {
         console.log("ERROR: ", reason); // real apps should use notification.alert
         if (reason === "Disconnected"){
             app.showStartPage();
+        }
+        if (reason.message === "Disconnected"){
+            app.bleReconnect();
         }
     }
 };
